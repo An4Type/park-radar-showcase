@@ -910,6 +910,7 @@
 
       updateFrameModeLabel();
       if (selectedFrame === 'vehicles') {
+        renderVehicleOverlay();
         void detectVehicles(source);
       } else {
         vehicleOverlay.hidden = true;
