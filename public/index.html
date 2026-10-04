@@ -37,16 +37,16 @@
 
     body {
       min-height: 100vh;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      display: flex;
       align-items: center;
-      gap: 64px;
-      padding: 24px clamp(24px, 6vw, 96px);
+      justify-content: center;
+      gap: clamp(40px, 6vw, 96px);
+      padding: 24px clamp(24px, 4vw, 64px);
     }
 
     .intro {
+      flex: 0 1 440px;
       max-width: 440px;
-      justify-self: end;
       display: flex;
       flex-direction: column;
       gap: 24px;
@@ -142,6 +142,7 @@
     .note { margin: 0; font-size: 13px; color: var(--muted); }
 
     .stage {
+      flex: none;
       width: calc(var(--phone-w) * var(--scale));
       height: calc(var(--phone-h) * var(--scale));
     }
@@ -256,12 +257,11 @@
 
     @media (max-width: 860px) {
       body {
-        grid-template-columns: 1fr;
-        justify-items: center;
+        flex-direction: column;
         gap: 32px;
         padding: 32px 20px;
       }
-      .intro { justify-self: center; text-align: center; align-items: center; }
+      .intro { flex-basis: auto; text-align: center; align-items: center; }
       .qr { display: none; }
     }
 
