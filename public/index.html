@@ -197,6 +197,30 @@
 
     .vision-title { font-size: 15px; font-weight: 800; }
 
+    .vision-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .vision-live-location {
+      height: 30px;
+      padding: 0 10px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--primary);
+      color: #fff;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background 160ms ease, opacity 160ms ease;
+    }
+
+    .vision-live-location:hover { background: var(--primary-pressed); }
+    .vision-live-location:disabled { opacity: 0.7; cursor: wait; }
+
     .vision-frame-shell {
       position: relative;
       min-height: 0;
@@ -570,7 +594,10 @@
       <section class="vision" aria-labelledby="vision-title">
         <div class="vision-header">
           <div class="vision-title" id="vision-title">Camera detection - AGH street parking</div>
-          <button class="vision-refresh" id="vision-refresh" type="button">Refresh</button>
+          <div class="vision-actions">
+            <button class="vision-live-location" id="go-live-location" type="button">Go to live location</button>
+            <button class="vision-refresh" id="vision-refresh" type="button">Refresh</button>
+          </div>
         </div>
         <p class="vision-status" id="vision-status" aria-live="polite">Connecting to the camera service…</p>
         <p class="vision-meta" id="vision-meta"></p>
@@ -606,7 +633,7 @@
   <script>
     const settings = window.PARK_RADAR_CONFIG || {};
     const APP_URL = 'https://park-radar.maksym782.workers.dev/';
-    const DETECTION_URL = 'http://localhost:3000/api/detection';
+    const DETECTION_URL = 'https://parkradar.makssm.com/showcase/api/detection';
     const PHONE = { w: 418, h: 872 };
 
     const appWorkspace = document.querySelector('.app-workspace');
@@ -616,6 +643,7 @@
     const visionMeta = document.getElementById('vision-meta');
     const visionFrame = document.getElementById('vision-frame');
     const visionRefresh = document.getElementById('vision-refresh');
+    const goLiveLocation = document.getElementById('go-live-location');
     const visionJson = document.getElementById('vision-json');
     const framePrevious = document.getElementById('frame-previous');
     const frameNext = document.getElementById('frame-next');
@@ -631,6 +659,13 @@
     let detectionInFlight = false;
     let vehicleModelPromise = null;
     let vehicleDetection = { source: null, phase: 'idle', detections: [], error: null };
+    let appFrameReady = false;
+    let liveLocationRequest = null;
+    let liveLocationTimeout = null;
+
+    const LIVE_LOCATION_QUERY = 'Agh street parking';
+    const LIVE_LOCATION_BUTTON_LABEL = 'Go to live location';
+    const appOrigin = new URL(APP_URL).origin;
 
     document.getElementById('open').href = APP_URL;
 
@@ -646,13 +681,60 @@
       if (stage) stage.hidden = false;
     }
 
-    function load() {
-      if (isDesktop() && !iframe.src) iframe.src = APP_URL;
+    function sendLiveLocationRequest() {
+      if (!liveLocationRequest || !appFrameReady || !iframe.contentWindow) return;
+      iframe.contentWindow.postMessage({
+        type: 'park-radar:go-to-live-location',
+        requestId: liveLocationRequest.id,
+        query: LIVE_LOCATION_QUERY,
+      }, appOrigin);
+    }
+
+    function setLiveLocationPending(pending) {
+      goLiveLocation.disabled = pending;
+      goLiveLocation.textContent = pending ? 'Opening live location…' : LIVE_LOCATION_BUTTON_LABEL;
+    }
+
+    function load(force = false) {
+      if ((isDesktop() || force) && !iframe.src) {
+        appFrameReady = false;
+        iframe.src = APP_URL;
+      }
     }
 
     document.getElementById('reload').addEventListener('click', () => {
+      appFrameReady = false;
       iframe.src = 'about:blank';
       requestAnimationFrame(() => (iframe.src = APP_URL));
+    });
+
+    iframe.addEventListener('load', () => {
+      if (iframe.src === 'about:blank') return;
+      appFrameReady = true;
+      sendLiveLocationRequest();
+    });
+
+    goLiveLocation.addEventListener('click', () => {
+      if (liveLocationRequest) return;
+      liveLocationRequest = { id: `live-location-${Date.now()}-${Math.random().toString(16).slice(2)}` };
+      setLiveLocationPending(true);
+      load(true);
+      sendLiveLocationRequest();
+      liveLocationTimeout = window.setTimeout(() => {
+        liveLocationRequest = null;
+        setLiveLocationPending(false);
+      }, 8000);
+    });
+
+    window.addEventListener('message', (event) => {
+      if (event.origin !== appOrigin || event.source !== iframe.contentWindow) return;
+      const message = event.data;
+      if (!message || message.type !== 'park-radar:live-location-complete' || !liveLocationRequest) return;
+      if (message.requestId !== liveLocationRequest.id) return;
+      window.clearTimeout(liveLocationTimeout);
+      liveLocationTimeout = null;
+      liveLocationRequest = null;
+      setLiveLocationPending(false);
     });
 
     function setVisionState(state, message, meta = '') {
