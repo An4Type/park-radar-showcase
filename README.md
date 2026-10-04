@@ -19,3 +19,10 @@ Set `CORS_ORIGINS=https://your-showcase.workers.dev` on the backend to restrict 
 
 - Deploy: `npx wrangler deploy` (Cloudflare Workers static assets)
 - Local preview: `npx wrangler dev`
+
+## Kraków (Polish) deployment
+
+`wrangler.krakow.jsonc` deploys the same page as `park-radar-krakow-demo`, in Polish and embedding `https://park-radar-krakow.maksym782.workers.dev/`. Its build step, `scripts/build-krakow.mjs`, copies `public/` to `dist/krakow/` and writes a `config.js` with `locale: 'pl'` and the Kraków URLs.
+
+- Deploy: `npx wrangler deploy -c wrangler.krakow.jsonc`
+- Local preview: `npx wrangler dev -c wrangler.krakow.jsonc`

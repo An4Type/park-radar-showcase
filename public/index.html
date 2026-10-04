@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Park Radar — live demo</title>
-  <meta name="description" content="Try Park Radar live: see where parking is free right now." />
+  <title data-i18n="pageTitle">Park Radar — live demo</title>
+  <meta name="description" data-i18n-content="pageDescription" content="Try Park Radar live: see where parking is free right now." />
   <link rel="icon" type="image/svg+xml" href="./icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -529,8 +529,8 @@
 </head>
 <body>
   <div class="dashboard">
-    <section class="app-workspace" aria-label="Park Radar app preview">
-      <div class="stage" aria-label="Park Radar running on a phone">
+    <section class="app-workspace" aria-label="Park Radar app preview" data-i18n-aria-label="appPreview">
+      <div class="stage" aria-label="Park Radar running on a phone" data-i18n-aria-label="phoneStage">
         <div class="phone">
           <div class="screen">
             <div class="status" aria-hidden="true">
@@ -542,8 +542,8 @@
               </span>
             </div>
             <div class="island" aria-hidden="true"></div>
-            <div class="loading">Loading Park Radar…</div>
-            <iframe id="app" title="Park Radar app" allow="geolocation; accelerometer; gyroscope; magnetometer; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            <div class="loading" data-i18n="loadingApp">Loading Park Radar…</div>
+            <iframe id="app" title="Park Radar app" data-i18n-title="appFrame" allow="geolocation; accelerometer; gyroscope; magnetometer; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>
             <div class="home" aria-hidden="true"></div>
           </div>
         </div>
@@ -551,58 +551,58 @@
 
       <main class="intro">
         <div class="brand"><img src="./icon.svg" alt="" />Park Radar</div>
-        <h1>See where parking is free right now.</h1>
-        <p class="lead">
+        <h1 data-i18n="headline">See where parking is free right now.</h1>
+        <p class="lead" data-i18n="lead">
           Live availability for every parking nearby, updated every few seconds, with turn-by-turn
           navigation along real roads to the spot you pick.
         </p>
         <div class="actions">
           <a class="button primary" id="open" href="#" target="_blank" rel="noopener">
-            Open app
+            <span data-i18n="openApp">Open app</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
           </a>
           <button class="button only-desktop" id="reload" type="button">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" /></svg>
-            Restart demo
+            <span data-i18n="restartDemo">Restart demo</span>
           </button>
         </div>
         <div class="qr only-desktop">
-          <div class="qr-code" id="qr" role="img" aria-label="QR code to open the app on your phone"></div>
-          <p><b>Try it on your phone.</b> Scan, then use “Add to Home Screen” to install it like an app.</p>
+          <div class="qr-code" id="qr" role="img" aria-label="QR code to open the app on your phone" data-i18n-aria-label="qrCode"></div>
+          <p data-i18n-html="qrHint"><b>Try it on your phone.</b> Scan, then use “Add to Home Screen” to install it like an app.</p>
         </div>
-        <p class="note only-mobile">Tip: after opening, use “Add to Home Screen” to install it.</p>
-        <p class="note only-desktop">Allow location to see parking around you. Demo data.</p>
+        <p class="note only-mobile" data-i18n="installTip">Tip: after opening, use “Add to Home Screen” to install it.</p>
+        <p class="note only-desktop" data-i18n="locationNote">Allow location to see parking around you. Demo data.</p>
       </main>
     </section>
 
-    <aside class="detection-workspace" aria-label="Live camera detection">
+    <aside class="detection-workspace" aria-label="Live camera detection" data-i18n-aria-label="detectionWorkspace">
       <section class="vision" aria-labelledby="vision-title">
         <div class="vision-header">
-          <div class="vision-title" id="vision-title">Camera detection - AGH street parking</div>
+          <div class="vision-title" id="vision-title" data-i18n="visionTitle">Camera detection - AGH street parking</div>
           <div class="vision-actions">
-            <button class="vision-live-location" id="go-live-location" type="button">Go to live location</button>
-            <button class="vision-refresh" id="vision-refresh" type="button">Refresh</button>
+            <button class="vision-live-location" id="go-live-location" type="button" data-i18n="goLiveLocation">Go to live location</button>
+            <button class="vision-refresh" id="vision-refresh" type="button" data-i18n="refresh">Refresh</button>
           </div>
         </div>
-        <p class="vision-status" id="vision-status" aria-live="polite">Connecting to the camera service…</p>
+        <p class="vision-status" id="vision-status" aria-live="polite" data-i18n="connecting">Connecting to the camera service…</p>
         <p class="vision-meta" id="vision-meta"></p>
         <div class="vision-frame-shell">
-          <div class="live-badge"><span class="vision-dot" id="vision-dot" aria-hidden="true"></span>LIVE</div>
-          <button class="frame-nav previous" id="frame-previous" type="button" aria-label="Show previous camera view" disabled>
+          <div class="live-badge"><span class="vision-dot" id="vision-dot" aria-hidden="true"></span><span data-i18n="live">LIVE</span></div>
+          <button class="frame-nav previous" id="frame-previous" type="button" aria-label="Show previous camera view" data-i18n-aria-label="previousView" disabled>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
           </button>
-          <img class="vision-frame" id="vision-frame" hidden alt="Latest parking camera frame" />
+          <img class="vision-frame" id="vision-frame" hidden alt="" />
           <canvas class="vehicle-overlay" id="vehicle-overlay" hidden aria-hidden="true"></canvas>
-          <button class="frame-nav next" id="frame-next" type="button" aria-label="Show next camera view" disabled>
+          <button class="frame-nav next" id="frame-next" type="button" aria-label="Show next camera view" data-i18n-aria-label="nextView" disabled>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
           </button>
-          <span class="frame-mode" id="frame-mode">Area zones</span>
+          <span class="frame-mode" id="frame-mode" data-i18n="areaZones">Area zones</span>
         </div>
       </section>
 
       <section class="api-response" aria-labelledby="api-response-title">
         <div class="api-response-header">
-          <h2 class="api-response-title" id="api-response-title">Worker API response</h2>
+          <h2 class="api-response-title" id="api-response-title" data-i18n="apiResponse">Worker API response</h2>
           <span class="api-response-route">GET /api/detection</span>
         </div>
         <pre class="api-json" id="vision-json" aria-live="polite">{
@@ -617,9 +617,112 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
   <script>
     const settings = window.PARK_RADAR_CONFIG || {};
-    const APP_URL = 'https://park-radar.maksym782.workers.dev/';
-    const DETECTION_URL = 'https://parkradar.makssm.com/showcase/api/detection';
+    const APP_URL = settings.appUrl || 'https://park-radar.maksym782.workers.dev/';
+    const DETECTION_URL = settings.detectionUrl || 'https://parkradar.makssm.com/showcase/api/detection';
     const PHONE = { w: 418, h: 872 };
+
+    const STRINGS = {
+      en: {
+        pageTitle: 'Park Radar — live demo',
+        pageDescription: 'Try Park Radar live: see where parking is free right now.',
+        appPreview: 'Park Radar app preview',
+        phoneStage: 'Park Radar running on a phone',
+        loadingApp: 'Loading Park Radar…',
+        appFrame: 'Park Radar app',
+        headline: 'See where parking is free right now.',
+        lead: 'Live availability for every parking nearby, updated every few seconds, with turn-by-turn navigation along real roads to the spot you pick.',
+        openApp: 'Open app',
+        restartDemo: 'Restart demo',
+        qrCode: 'QR code to open the app on your phone',
+        qrHint: '<b>Try it on your phone.</b> Scan, then use “Add to Home Screen” to install it like an app.',
+        installTip: 'Tip: after opening, use “Add to Home Screen” to install it.',
+        locationNote: 'Allow location to see parking around you. Demo data.',
+        detectionWorkspace: 'Live camera detection',
+        visionTitle: 'Camera detection - AGH street parking',
+        goLiveLocation: 'Go to live location',
+        openingLiveLocation: 'Opening live location…',
+        refresh: 'Refresh',
+        connecting: 'Connecting to the camera service…',
+        live: 'LIVE',
+        previousView: 'Show previous camera view',
+        nextView: 'Show next camera view',
+        apiResponse: 'Worker API response',
+        rawCamera: 'Raw camera',
+        parkedVehicles: (count) => `${count} parked vehicle${count === 1 ? '' : 's'}`,
+        noParkedVehicles: 'No parked vehicles',
+        areaZones: 'Area zones',
+        areaZonesFree: (free) => `Area zones · ${free} free`,
+        zoneFree: (id, free, capacity) => `${id} · ${free}/${capacity} free`,
+        rawAlt: 'Latest raw parking camera frame',
+        vehiclesAlt: 'Latest parking camera frame with parked vehicles highlighted',
+        zonesAlt: 'Latest parking camera frame with parking area zones outlined',
+        serviceUnavailable: 'Camera service is unavailable. Retrying shortly.',
+        serviceStatus: (status) => `Camera service returned ${status}.`,
+        waitingForFrame: 'Waiting for the first captured frame.',
+        capturedAt: (time) => `Captured ${time}`,
+      },
+      pl: {
+        pageTitle: 'Park Radar — demo na żywo',
+        pageDescription: 'Wypróbuj Park Radar na żywo: zobacz, gdzie teraz są wolne miejsca parkingowe.',
+        appPreview: 'Podgląd aplikacji Park Radar',
+        phoneStage: 'Park Radar uruchomiony na telefonie',
+        loadingApp: 'Ładowanie Park Radar…',
+        appFrame: 'Aplikacja Park Radar',
+        headline: 'Zobacz, gdzie teraz jest wolne miejsce.',
+        lead: 'Dostępność miejsc na pobliskich parkingach na żywo, odświeżana co kilka sekund, z nawigacją krok po kroku po prawdziwych drogach do wybranego miejsca.',
+        openApp: 'Otwórz aplikację',
+        restartDemo: 'Uruchom ponownie',
+        qrCode: 'Kod QR do otwarcia aplikacji na telefonie',
+        qrHint: '<b>Wypróbuj na telefonie.</b> Zeskanuj kod, a potem wybierz „Dodaj do ekranu głównego”, aby zainstalować ją jak aplikację.',
+        installTip: 'Wskazówka: po otwarciu wybierz „Dodaj do ekranu głównego”, aby ją zainstalować.',
+        locationNote: 'Zezwól na dostęp do lokalizacji, aby zobaczyć parkingi w pobliżu. Dane demonstracyjne.',
+        detectionWorkspace: 'Detekcja z kamery na żywo',
+        visionTitle: 'Detekcja z kamery – parking przy AGH',
+        goLiveLocation: 'Pokaż na mapie',
+        openingLiveLocation: 'Otwieranie lokalizacji…',
+        refresh: 'Odśwież',
+        connecting: 'Łączenie z usługą kamery…',
+        live: 'NA ŻYWO',
+        previousView: 'Pokaż poprzedni widok kamery',
+        nextView: 'Pokaż następny widok kamery',
+        apiResponse: 'Odpowiedź API',
+        rawCamera: 'Obraz z kamery',
+        parkedVehicles: (count) => {
+          const form = new Intl.PluralRules('pl').select(count);
+          return `${count} ${form === 'one' ? 'zaparkowany pojazd' : form === 'few' ? 'zaparkowane pojazdy' : 'zaparkowanych pojazdów'}`;
+        },
+        noParkedVehicles: 'Brak zaparkowanych pojazdów',
+        areaZones: 'Strefy parkowania',
+        areaZonesFree: (free) => `Strefy parkowania · wolne: ${free}`,
+        zoneFree: (id, free, capacity) => `${id} · wolne ${free}/${capacity}`,
+        rawAlt: 'Najnowsza klatka z kamery parkingu',
+        vehiclesAlt: 'Najnowsza klatka z kamery z zaznaczonymi zaparkowanymi pojazdami',
+        zonesAlt: 'Najnowsza klatka z kamery z zaznaczonymi strefami parkowania',
+        serviceUnavailable: 'Usługa kamery jest niedostępna. Ponowna próba za chwilę.',
+        serviceStatus: (status) => `Usługa kamery zwróciła kod ${status}.`,
+        waitingForFrame: 'Oczekiwanie na pierwszą klatkę.',
+        capturedAt: (time) => `Zarejestrowano ${time}`,
+        // The detection API reports its progress in English only.
+        apiStatus: {
+          ready: 'Obraz z kamery jest aktualny.',
+          error: 'Usługa kamery zgłosiła błąd.',
+          loading: 'Analizowanie obrazu z kamery…',
+        },
+      },
+    };
+    const LOCALE = STRINGS[settings.locale] ? settings.locale : 'en';
+    const TEXT = STRINGS[LOCALE];
+
+    function applyStaticText() {
+      document.documentElement.lang = LOCALE;
+      for (const element of document.querySelectorAll('[data-i18n]')) element.textContent = TEXT[element.dataset.i18n];
+      for (const element of document.querySelectorAll('[data-i18n-html]')) element.innerHTML = TEXT[element.dataset.i18nHtml];
+      for (const [attribute, key] of [['aria-label', 'i18nAriaLabel'], ['title', 'i18nTitle'], ['content', 'i18nContent']]) {
+        for (const element of document.querySelectorAll(`[data-i18n-${attribute}]`)) element.setAttribute(attribute, TEXT[element.dataset[key]]);
+      }
+    }
+
+    applyStaticText();
 
     const appWorkspace = document.querySelector('.app-workspace');
     const iframe = document.getElementById('app');
@@ -646,7 +749,6 @@
     let liveLocationTimeout = null;
 
     const LIVE_LOCATION_QUERY = 'Agh street parking';
-    const LIVE_LOCATION_BUTTON_LABEL = 'Go to live location';
     const appOrigin = new URL(APP_URL).origin;
 
     document.getElementById('open').href = APP_URL;
@@ -674,7 +776,7 @@
 
     function setLiveLocationPending(pending) {
       goLiveLocation.disabled = pending;
-      goLiveLocation.textContent = pending ? 'Opening live location…' : LIVE_LOCATION_BUTTON_LABEL;
+      goLiveLocation.textContent = pending ? TEXT.openingLiveLocation : TEXT.goLiveLocation;
     }
 
     function load(force = false) {
@@ -745,13 +847,13 @@
 
     function updateFrameModeLabel() {
       if (selectedFrame === 'original') {
-        frameMode.textContent = 'Raw camera';
+        frameMode.textContent = TEXT.rawCamera;
       } else if (selectedFrame === 'vehicles') {
         const count = parkedVehicles.length;
-        frameMode.textContent = count ? `${count} parked vehicle${count === 1 ? '' : 's'}` : 'No parked vehicles';
+        frameMode.textContent = count ? TEXT.parkedVehicles(count) : TEXT.noParkedVehicles;
       } else {
         const free = areaZones.reduce((sum, zone) => sum + (Number.isFinite(zone.free) ? zone.free : 0), 0);
-        frameMode.textContent = areaZones.length ? `Area zones · ${free} free` : 'Area zones';
+        frameMode.textContent = areaZones.length ? TEXT.areaZonesFree(free) : TEXT.areaZones;
       }
     }
 
@@ -805,7 +907,7 @@
         context.stroke();
 
         const label = Number.isFinite(zone.free) && Number.isFinite(zone.capacity)
-          ? `${zone.id} · ${zone.free}/${zone.capacity} free`
+          ? TEXT.zoneFree(zone.id, zone.free, zone.capacity)
           : zone.id;
         const [anchorX, anchorY] = points.reduce((top, point) => (point[1] < top[1] ? point : top));
         const width = context.measureText(label).width + 10;
@@ -859,10 +961,10 @@
       framePrevious.disabled = !cameraFrame;
       frameNext.disabled = !cameraFrame;
       visionFrame.alt = selectedFrame === 'original'
-        ? 'Latest raw parking camera frame'
+        ? TEXT.rawAlt
         : selectedFrame === 'vehicles'
-          ? 'Latest parking camera frame with parked vehicles highlighted'
-          : 'Latest parking camera frame with parking area zones outlined';
+          ? TEXT.vehiclesAlt
+          : TEXT.zonesAlt;
 
       updateFrameModeLabel();
       renderFrameOverlay();
@@ -886,17 +988,17 @@
     }
 
     function capturedAtLabel(capturedAt) {
-      if (!capturedAt) return 'Waiting for the first captured frame.';
+      if (!capturedAt) return TEXT.waitingForFrame;
       const captured = new Date(capturedAt);
       if (Number.isNaN(captured.getTime())) return '';
-      return `Captured ${captured.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+      return TEXT.capturedAt(captured.toLocaleTimeString(LOCALE === 'pl' ? 'pl-PL' : [], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
     }
 
     async function loadDetection({ refresh = false } = {}) {
       if (detectionInFlight) return;
       detectionInFlight = true;
       visionRefresh.disabled = true;
-      if (visionFrame.hidden) setVisionState('loading', 'Connecting to the camera service…');
+      if (visionFrame.hidden) setVisionState('loading', TEXT.connecting);
 
       try {
         const endpoint = new URL(DETECTION_URL, window.location.href);
@@ -914,14 +1016,15 @@
         renderSelectedFrame();
 
         const state = payload.status === 'ready' ? 'ready' : payload.status === 'error' ? 'error' : 'loading';
-        setVisionState(state, payload.message || `Camera service returned ${response.status}.`, capturedAtLabel(payload.capturedAt));
+        const message = TEXT.apiStatus ? TEXT.apiStatus[state] : payload.message || TEXT.serviceStatus(response.status);
+        setVisionState(state, message, capturedAtLabel(payload.capturedAt));
         renderApiResponse(payload);
         scheduleDetection(payload.intervalMs);
       } catch (_error) {
-        setVisionState('error', 'Camera service is unavailable. Retrying shortly.');
+        setVisionState('error', TEXT.serviceUnavailable);
         renderApiResponse({
           status: 'error',
-          message: 'Camera service is unavailable. Retrying shortly.',
+          message: TEXT.serviceUnavailable,
         });
         scheduleDetection(10000);
       } finally {
