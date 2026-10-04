@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Park Radar — live demo</title>
   <meta name="description" content="Try Park Radar live: see where parking is free right now." />
-  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  <link rel="icon" type="image/svg+xml" href="./icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" />
@@ -50,11 +50,11 @@
       margin: 0 auto;
       display: grid;
       grid-template-columns: minmax(0, 1.2fr) minmax(390px, 0.8fr);
-      background: color-mix(in srgb, var(--surface) 54%, transparent);
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      overflow: hidden;
-      box-shadow: 0 20px 48px -36px rgba(20, 23, 28, 0.48);
+      /* background: color-mix(in srgb, var(--surface) 54%, transparent); */
+      /* border: 1px solid var(--border); */
+      /* border-radius: 28px; */
+      /* overflow: hidden; */
+      /* box-shaddashow: 0 20px 48px -36px rgba(20, 23, 28, 0.48); */
     }
 
     .app-workspace {
@@ -267,6 +267,17 @@
 
     .vision-frame[hidden] { display: none; }
 
+    .vehicle-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .vehicle-overlay[hidden] { display: none; }
+
     .frame-nav {
       position: absolute;
       top: 50%;
@@ -305,6 +316,21 @@
       transform: translateX(-50%);
       backdrop-filter: blur(8px);
     }
+
+    .frame-mode.loading::before {
+      content: '';
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin: 0 5px 0 1px;
+      border: 1.5px solid rgba(255, 255, 255, 0.45);
+      border-top-color: #fff;
+      border-radius: 50%;
+      vertical-align: -1px;
+      animation: spin 800ms linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .api-response {
       min-height: 0;
@@ -515,7 +541,7 @@
       </div>
 
       <main class="intro">
-        <div class="brand"><img src="/icon.svg" alt="" />Park Radar</div>
+        <div class="brand"><img src="./icon.svg" alt="" />Park Radar</div>
         <h1>See where parking is free right now.</h1>
         <p class="lead">
           Live availability for every parking nearby, updated every few seconds, with turn-by-turn
@@ -543,7 +569,7 @@
     <aside class="detection-workspace" aria-label="Live camera detection">
       <section class="vision" aria-labelledby="vision-title">
         <div class="vision-header">
-          <div class="vision-title" id="vision-title">Camera detection</div>
+          <div class="vision-title" id="vision-title">Camera detection - AGH street parking</div>
           <button class="vision-refresh" id="vision-refresh" type="button">Refresh</button>
         </div>
         <p class="vision-status" id="vision-status" aria-live="polite">Connecting to the camera service…</p>
@@ -554,6 +580,7 @@
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
           </button>
           <img class="vision-frame" id="vision-frame" hidden alt="Latest parking camera frame" />
+          <canvas class="vehicle-overlay" id="vehicle-overlay" hidden aria-label="Detected vehicles highlighted in the parking camera frame"></canvas>
           <button class="frame-nav next" id="frame-next" type="button" aria-label="Show next camera view" disabled>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
           </button>
@@ -574,12 +601,12 @@
     </aside>
   </div>
 
-  <script src="/config.js"></script>
+  <script src="./config.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
   <script>
     const settings = window.PARK_RADAR_CONFIG || {};
     const APP_URL = 'https://park-radar.maksym782.workers.dev/';
-    const DETECTION_URL = settings.detectionUrl || 'http://localhost:3000/api/detection';
+    const DETECTION_URL = 'http://localhost:3000/api/detection';
     const PHONE = { w: 418, h: 872 };
 
     const appWorkspace = document.querySelector('.app-workspace');
@@ -593,11 +620,17 @@
     const framePrevious = document.getElementById('frame-previous');
     const frameNext = document.getElementById('frame-next');
     const frameMode = document.getElementById('frame-mode');
+    const vehicleOverlay = document.getElementById('vehicle-overlay');
     const isDesktop = () => window.matchMedia('(min-width: 601px)').matches;
     const detectionFrames = { original: null, masked: null };
+    const VEHICLE_CLASSES = new Set(['car', 'truck', 'bus', 'motorcycle', 'bicycle']);
+    const TFJS_URL = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js';
+    const COCO_SSD_URL = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js';
     let selectedFrame = 'masked';
     let detectionTimer = null;
     let detectionInFlight = false;
+    let vehicleModelPromise = null;
+    let vehicleDetection = { source: null, phase: 'idle', detections: [], error: null };
 
     document.getElementById('open').href = APP_URL;
 
@@ -639,29 +672,178 @@
       visionJson.textContent = JSON.stringify(preview, null, 2);
     }
 
+    function availableFrameModes() {
+      const modes = [];
+      if (detectionFrames.masked) modes.push('masked');
+      if (detectionFrames.original) modes.push('original');
+      if (detectionFrames.original || detectionFrames.masked) modes.push('vehicles');
+      return modes;
+    }
+
+    function sourceForMode(mode) {
+      return mode === 'masked'
+        ? detectionFrames.masked || detectionFrames.original
+        : detectionFrames.original || detectionFrames.masked;
+    }
+
+    function updateFrameModeLabel() {
+      frameMode.classList.remove('loading');
+      if (selectedFrame === 'original') {
+        frameMode.textContent = 'Original';
+      } else if (selectedFrame === 'masked') {
+        frameMode.textContent = 'Detection zones';
+      } else if (vehicleDetection.phase === 'loading') {
+        frameMode.textContent = 'Finding vehicles…';
+        frameMode.classList.add('loading');
+      } else if (vehicleDetection.phase === 'error') {
+        frameMode.textContent = 'Vehicle detector unavailable';
+      } else if (vehicleDetection.phase === 'ready') {
+        const count = vehicleDetection.detections.length;
+        frameMode.textContent = count ? `${count} vehicle${count === 1 ? '' : 's'} highlighted` : 'No vehicles detected';
+      } else {
+        frameMode.textContent = 'Vehicle highlights';
+      }
+    }
+
+    function loadExternalScript(id, source, ready) {
+      if (ready()) return Promise.resolve();
+      return new Promise((resolve, reject) => {
+        const existing = document.getElementById(id);
+        if (existing) {
+          existing.addEventListener('load', resolve, { once: true });
+          existing.addEventListener('error', () => reject(new Error(`Unable to load ${source}`)), { once: true });
+          return;
+        }
+        const script = document.createElement('script');
+        script.id = id;
+        script.src = source;
+        script.async = true;
+        script.onload = resolve;
+        script.onerror = () => reject(new Error(`Unable to load ${source}`));
+        document.head.append(script);
+      });
+    }
+
+    function vehicleModel() {
+      if (!vehicleModelPromise) {
+        vehicleModelPromise = loadExternalScript('tfjs', TFJS_URL, () => Boolean(window.tf))
+          .then(() => loadExternalScript('coco-ssd', COCO_SSD_URL, () => Boolean(window.cocoSsd)))
+          .then(() => window.cocoSsd.load({ base: 'lite_mobilenet_v2' }));
+      }
+      return vehicleModelPromise;
+    }
+
+    function imageFromSource(source) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error('The camera image could not be analysed.'));
+        image.src = source;
+      });
+    }
+
+    function renderVehicleOverlay() {
+      const source = sourceForMode('vehicles');
+      const shouldDraw = selectedFrame === 'vehicles'
+        && vehicleDetection.phase === 'ready'
+        && vehicleDetection.source === source
+        && vehicleDetection.detections.length > 0
+        && visionFrame.naturalWidth > 0
+        && visionFrame.naturalHeight > 0;
+      if (!shouldDraw) {
+        vehicleOverlay.hidden = true;
+        return;
+      }
+
+      const shell = visionFrame.getBoundingClientRect();
+      const naturalWidth = visionFrame.naturalWidth;
+      const naturalHeight = visionFrame.naturalHeight;
+      const scale = Math.min(shell.width / naturalWidth, shell.height / naturalHeight);
+      const renderedWidth = naturalWidth * scale;
+      const renderedHeight = naturalHeight * scale;
+      const offsetX = (shell.width - renderedWidth) / 2;
+      const offsetY = (shell.height - renderedHeight) / 2;
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      vehicleOverlay.width = Math.round(shell.width * pixelRatio);
+      vehicleOverlay.height = Math.round(shell.height * pixelRatio);
+      const context = vehicleOverlay.getContext('2d');
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      context.clearRect(0, 0, shell.width, shell.height);
+
+      for (const detection of vehicleDetection.detections) {
+        const [x, y, width, height] = detection.bbox;
+        const left = Math.max(offsetX, offsetX + x * scale);
+        const top = Math.max(offsetY, offsetY + y * scale);
+        const right = Math.min(offsetX + renderedWidth, offsetX + (x + width) * scale);
+        const bottom = Math.min(offsetY + renderedHeight, offsetY + (y + height) * scale);
+        if (right <= left || bottom <= top) continue;
+
+        context.fillStyle = 'rgba(36, 99, 235, 0.18)';
+        context.strokeStyle = '#7ee7ff';
+        context.lineWidth = 2;
+        context.fillRect(left, top, right - left, bottom - top);
+        context.strokeRect(left, top, right - left, bottom - top);
+
+      }
+      vehicleOverlay.hidden = false;
+    }
+
+    async function detectVehicles(source) {
+      if (!source || (vehicleDetection.source === source && vehicleDetection.phase !== 'idle')) return;
+      vehicleDetection = { source, phase: 'loading', detections: [], error: null };
+      updateFrameModeLabel();
+      renderVehicleOverlay();
+
+      try {
+        const [model, image] = await Promise.all([vehicleModel(), imageFromSource(source)]);
+        const predictions = await model.detect(image, 20, 0.45);
+        if (vehicleDetection.source !== source) return;
+        vehicleDetection = {
+          source,
+          phase: 'ready',
+          detections: predictions.filter(({ class: className, score }) => VEHICLE_CLASSES.has(className) && score >= 0.45),
+          error: null,
+        };
+      } catch (error) {
+        if (vehicleDetection.source !== source) return;
+        vehicleDetection = { source, phase: 'error', detections: [], error: error.message };
+      }
+      updateFrameModeLabel();
+      renderVehicleOverlay();
+    }
+
     function renderSelectedFrame() {
-      const preferred = detectionFrames[selectedFrame];
-      const fallbackKey = selectedFrame === 'masked' ? 'original' : 'masked';
-      const source = preferred || detectionFrames[fallbackKey];
-      if (!preferred && source) selectedFrame = fallbackKey;
+      const modes = availableFrameModes();
+      if (!modes.includes(selectedFrame)) selectedFrame = modes[0] || 'masked';
+      const source = sourceForMode(selectedFrame);
 
       if (source) {
         visionFrame.src = source;
         visionFrame.hidden = false;
       }
 
-      const canSwitch = Boolean(detectionFrames.original && detectionFrames.masked);
+      const canSwitch = modes.length > 1;
       framePrevious.disabled = !canSwitch;
       frameNext.disabled = !canSwitch;
-      frameMode.textContent = selectedFrame === 'original' ? 'Original' : 'Detection zones';
       visionFrame.alt = selectedFrame === 'original'
         ? 'Latest original parking camera frame'
-        : 'Latest parking camera frame with marked detection areas';
+        : selectedFrame === 'vehicles'
+          ? 'Latest parking camera frame with detected vehicles highlighted'
+          : 'Latest parking camera frame with marked detection areas';
+
+      updateFrameModeLabel();
+      if (selectedFrame === 'vehicles') {
+        void detectVehicles(source);
+      } else {
+        vehicleOverlay.hidden = true;
+      }
     }
 
-    function switchFrame() {
-      if (!detectionFrames.original || !detectionFrames.masked) return;
-      selectedFrame = selectedFrame === 'masked' ? 'original' : 'masked';
+    function switchFrame(direction) {
+      const modes = availableFrameModes();
+      if (modes.length < 2) return;
+      const current = Math.max(0, modes.indexOf(selectedFrame));
+      selectedFrame = modes[(current + direction + modes.length) % modes.length];
       renderSelectedFrame();
     }
 
@@ -719,8 +901,9 @@
       }
     }
 
-    framePrevious.addEventListener('click', switchFrame);
-    frameNext.addEventListener('click', switchFrame);
+    visionFrame.addEventListener('load', renderVehicleOverlay);
+    framePrevious.addEventListener('click', () => switchFrame(-1));
+    frameNext.addEventListener('click', () => switchFrame(1));
     visionRefresh.addEventListener('click', () => { void loadDetection({ refresh: true }); });
 
     function tick() {
@@ -728,7 +911,7 @@
       document.getElementById('clock').textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).replace(/\s?[AP]M$/i, '');
     }
 
-    window.addEventListener('resize', () => { fit(); load(); });
+    window.addEventListener('resize', () => { fit(); load(); renderVehicleOverlay(); });
     window.addEventListener('DOMContentLoaded', () => {
       if (window.QRCode) new QRCode(document.getElementById('qr'), { text: APP_URL, width: 224, height: 224, colorDark: '#14171c', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
     });
