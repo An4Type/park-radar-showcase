@@ -28,7 +28,9 @@
 
     html, body {
       margin: 0;
-      min-height: 100%;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
       background: var(--ground);
       color: var(--ink);
       font-family: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -36,16 +38,38 @@
     }
 
     body {
-      min-height: 100vh;
+      height: 100vh;
+      height: 100dvh;
+      padding: 20px;
+    }
+
+    .dashboard {
+      width: min(1800px, 100%);
+      height: calc(100vh - 40px);
+      height: calc(100dvh - 40px);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(390px, 0.8fr);
+      background: color-mix(in srgb, var(--surface) 54%, transparent);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 20px 48px -36px rgba(20, 23, 28, 0.48);
+    }
+
+    .app-workspace {
+      min-width: 0;
+      min-height: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: clamp(40px, 6vw, 96px);
-      padding: 24px clamp(24px, 4vw, 64px);
+      gap: clamp(24px, 3vw, 56px);
+      padding: clamp(24px, 4vw, 64px);
+      border-right: 1px solid var(--border);
     }
 
     .intro {
-      flex: 0 1 440px;
+      flex: 1 1 360px;
       max-width: 440px;
       display: flex;
       flex-direction: column;
@@ -140,6 +164,178 @@
     .qr b { color: var(--ink); }
 
     .note { margin: 0; font-size: 13px; color: var(--muted); }
+
+    .detection-workspace {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) minmax(210px, 0.72fr);
+      gap: 16px;
+      padding: clamp(20px, 3vw, 40px);
+    }
+
+    .vision,
+    .api-response {
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--surface);
+    }
+
+    .vision {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .vision-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .vision-title { font-size: 15px; font-weight: 800; }
+
+    .vision-frame-shell {
+      position: relative;
+      min-height: 0;
+      flex: 1;
+      margin-top: 8px;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #0d0f12;
+    }
+
+    .live-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 3;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 9px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      background: rgba(13, 15, 18, 0.78);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.28);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      line-height: 1;
+      backdrop-filter: blur(8px);
+    }
+
+    .vision-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #8a919c;
+      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.16);
+    }
+
+    .vision-dot.ready { background: #2bdc94; box-shadow: 0 0 0 4px rgba(43, 220, 148, 0.2); }
+    .vision-dot.error { background: #ff5d5d; box-shadow: 0 0 0 4px rgba(255, 93, 93, 0.2); }
+
+    .vision-refresh {
+      border: 0;
+      padding: 4px 0;
+      background: transparent;
+      color: var(--primary);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .vision-refresh:hover { color: var(--primary-pressed); }
+    .vision-refresh:disabled { color: var(--muted); cursor: wait; }
+
+    .vision-status { margin: 6px 0 0; font-size: 11px; line-height: 1.35; color: var(--ink-2); }
+    .vision-status[hidden] { display: none; }
+    .vision-meta { margin: 3px 0 0; font-size: 10px; color: var(--muted); }
+
+    .vision-frame {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #0d0f12;
+    }
+
+    .vision-frame[hidden] { display: none; }
+
+    .frame-nav {
+      position: absolute;
+      top: 50%;
+      z-index: 3;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 50%;
+      background: rgba(13, 15, 18, 0.74);
+      color: #fff;
+      cursor: pointer;
+      transform: translateY(-50%);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(8px);
+    }
+
+    .frame-nav:hover { background: rgba(13, 15, 18, 0.92); }
+    .frame-nav:disabled { opacity: 0.36; cursor: default; }
+    .frame-nav.previous { left: 12px; }
+    .frame-nav.next { right: 12px; }
+
+    .frame-mode {
+      position: absolute;
+      left: 50%;
+      bottom: 12px;
+      z-index: 3;
+      padding: 5px 9px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      background: rgba(13, 15, 18, 0.72);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      transform: translateX(-50%);
+      backdrop-filter: blur(8px);
+    }
+
+    .api-response {
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .api-response-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .api-response-title { margin: 0; font-size: 13px; font-weight: 800; }
+    .api-response-route { color: var(--muted); font-size: 10px; white-space: nowrap; }
+
+    .api-json {
+      min-height: 0;
+      flex: 1;
+      margin: 8px 0 0;
+      padding: 11px;
+      overflow: auto;
+      border-radius: 12px;
+      background: #171a20;
+      color: #d8e5ff;
+      font: 10px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      tab-size: 2;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
 
     .stage {
       flex: none;
@@ -255,19 +451,40 @@
       font-size: 14px;
     }
 
-    @media (max-width: 860px) {
-      body {
-        flex-direction: column;
-        gap: 32px;
-        padding: 32px 20px;
+    @media (max-width: 920px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 0.9fr) minmax(0, 1.1fr);
       }
-      .intro { flex-basis: auto; text-align: center; align-items: center; }
+      .app-workspace { border: 0; border-bottom: 1px solid var(--border); }
       .qr { display: none; }
+      .detection-workspace { min-height: 0; padding: 16px; }
+    }
+
+    @media (max-width: 860px) {
+      body { padding: 12px; }
+      .dashboard {
+        height: calc(100vh - 24px);
+        height: calc(100dvh - 24px);
+        border-radius: 22px;
+      }
+      .app-workspace { padding: 14px 20px; }
+      .intro { flex-basis: auto; gap: 12px; }
+      .brand img { width: 32px; height: 32px; }
+      .brand { font-size: 15px; }
+      h1 { font-size: clamp(27px, 5vw, 40px); }
+      .lead { font-size: 14px; }
+      .button { height: 42px; padding: 0 17px; font-size: 14px; }
+      .note { display: none; }
+      .detection-workspace { padding: 12px; gap: 10px; }
     }
 
     @media (max-width: 600px), (pointer: coarse) and (max-width: 900px) {
       .stage { display: none; }
       .only-desktop { display: none; }
+      .app-workspace { justify-content: center; }
+      .intro { text-align: center; align-items: center; }
+      .detection-workspace { grid-template-rows: minmax(0, 1fr) minmax(130px, 0.62fr); }
     }
 
     @media (min-width: 601px) {
@@ -276,67 +493,123 @@
   </style>
 </head>
 <body>
-  <main class="intro">
-    <div class="brand"><img src="/icon.svg" alt="" />Park Radar</div>
-    <h1>See where parking is free right now.</h1>
-    <p class="lead">
-      Live availability for every parking nearby, updated every few seconds, with turn-by-turn
-      navigation along real roads to the spot you pick.
-    </p>
-    <div class="actions">
-      <a class="button primary" id="open" href="#" target="_blank" rel="noopener">
-        Open app
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-      </a>
-      <button class="button only-desktop" id="reload" type="button">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" /></svg>
-        Restart demo
-      </button>
-    </div>
-    <div class="qr only-desktop">
-      <div class="qr-code" id="qr" role="img" aria-label="QR code to open the app on your phone"></div>
-      <p><b>Try it on your phone.</b> Scan, then use “Add to Home Screen” to install it like an app.</p>
-    </div>
-    <p class="note only-mobile">Tip: after opening, use “Add to Home Screen” to install it.</p>
-    <p class="note only-desktop">Allow location to see parking around you. Demo data.</p>
-  </main>
-
-  <div class="stage" aria-label="Park Radar running on a phone">
-    <div class="phone">
-      <div class="screen">
-        <div class="status" aria-hidden="true">
-          <span id="clock">9:41</span>
-          <span class="status-icons">
-            <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1" fill="#14171c"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="#14171c"/><rect x="10" y="3" width="3" height="9" rx="1" fill="#14171c"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#14171c"/></svg>
-            <svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M8 11.5 5.6 9a3.4 3.4 0 0 1 4.8 0L8 11.5zM3.2 6.6a6.8 6.8 0 0 1 9.6 0l-1.2 1.2a5.1 5.1 0 0 0-7.2 0L3.2 6.6zM.8 4.2a10.2 10.2 0 0 1 14.4 0L14 5.4a8.5 8.5 0 0 0-12 0L.8 4.2z" fill="#14171c"/></svg>
-            <svg width="27" height="13" viewBox="0 0 27 13" aria-hidden="true"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="#14171c" opacity=".4"/><rect x="2" y="2" width="18" height="9" rx="2" fill="#14171c"/><path d="M25 4.5v4a2 2 0 0 0 0-4z" fill="#14171c" opacity=".4"/></svg>
-          </span>
+  <div class="dashboard">
+    <section class="app-workspace" aria-label="Park Radar app preview">
+      <div class="stage" aria-label="Park Radar running on a phone">
+        <div class="phone">
+          <div class="screen">
+            <div class="status" aria-hidden="true">
+              <span id="clock">9:41</span>
+              <span class="status-icons">
+                <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1" fill="#14171c"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="#14171c"/><rect x="10" y="3" width="3" height="9" rx="1" fill="#14171c"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#14171c"/></svg>
+                <svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M8 11.5 5.6 9a3.4 3.4 0 0 1 4.8 0L8 11.5zM3.2 6.6a6.8 6.8 0 0 1 9.6 0l-1.2 1.2a5.1 5.1 0 0 0-7.2 0L3.2 6.6zM.8 4.2a10.2 10.2 0 0 1 14.4 0L14 5.4a8.5 8.5 0 0 0-12 0L.8 4.2z" fill="#14171c"/></svg>
+                <svg width="27" height="13" viewBox="0 0 27 13" aria-hidden="true"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="#14171c" opacity=".4"/><rect x="2" y="2" width="18" height="9" rx="2" fill="#14171c"/><path d="M25 4.5v4a2 2 0 0 0 0-4z" fill="#14171c" opacity=".4"/></svg>
+              </span>
+            </div>
+            <div class="island" aria-hidden="true"></div>
+            <div class="loading">Loading Park Radar…</div>
+            <iframe id="app" title="Park Radar app" allow="geolocation; accelerometer; gyroscope; magnetometer; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            <div class="home" aria-hidden="true"></div>
+          </div>
         </div>
-        <div class="island" aria-hidden="true"></div>
-        <div class="loading">Loading Park Radar…</div>
-        <iframe id="app" title="Park Radar app" allow="geolocation; accelerometer; gyroscope; magnetometer; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-        <div class="home" aria-hidden="true"></div>
       </div>
-    </div>
+
+      <main class="intro">
+        <div class="brand"><img src="/icon.svg" alt="" />Park Radar</div>
+        <h1>See where parking is free right now.</h1>
+        <p class="lead">
+          Live availability for every parking nearby, updated every few seconds, with turn-by-turn
+          navigation along real roads to the spot you pick.
+        </p>
+        <div class="actions">
+          <a class="button primary" id="open" href="#" target="_blank" rel="noopener">
+            Open app
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </a>
+          <button class="button only-desktop" id="reload" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" /></svg>
+            Restart demo
+          </button>
+        </div>
+        <div class="qr only-desktop">
+          <div class="qr-code" id="qr" role="img" aria-label="QR code to open the app on your phone"></div>
+          <p><b>Try it on your phone.</b> Scan, then use “Add to Home Screen” to install it like an app.</p>
+        </div>
+        <p class="note only-mobile">Tip: after opening, use “Add to Home Screen” to install it.</p>
+        <p class="note only-desktop">Allow location to see parking around you. Demo data.</p>
+      </main>
+    </section>
+
+    <aside class="detection-workspace" aria-label="Live camera detection">
+      <section class="vision" aria-labelledby="vision-title">
+        <div class="vision-header">
+          <div class="vision-title" id="vision-title">Camera detection</div>
+          <button class="vision-refresh" id="vision-refresh" type="button">Refresh</button>
+        </div>
+        <p class="vision-status" id="vision-status" aria-live="polite">Connecting to the camera service…</p>
+        <p class="vision-meta" id="vision-meta"></p>
+        <div class="vision-frame-shell">
+          <div class="live-badge"><span class="vision-dot" id="vision-dot" aria-hidden="true"></span>LIVE</div>
+          <button class="frame-nav previous" id="frame-previous" type="button" aria-label="Show previous camera view" disabled>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+          </button>
+          <img class="vision-frame" id="vision-frame" hidden alt="Latest parking camera frame" />
+          <button class="frame-nav next" id="frame-next" type="button" aria-label="Show next camera view" disabled>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+          </button>
+          <span class="frame-mode" id="frame-mode">Detection zones</span>
+        </div>
+      </section>
+
+      <section class="api-response" aria-labelledby="api-response-title">
+        <div class="api-response-header">
+          <h2 class="api-response-title" id="api-response-title">Worker API response</h2>
+          <span class="api-response-route">GET /api/detection</span>
+        </div>
+        <pre class="api-json" id="vision-json" aria-live="polite">{
+  "status": "waiting",
+  "message": "Waiting for the camera service…"
+}</pre>
+      </section>
+    </aside>
   </div>
 
+  <script src="/config.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
   <script>
+    const settings = window.PARK_RADAR_CONFIG || {};
     const APP_URL = 'https://park-radar.maksym782.workers.dev/';
+    const DETECTION_URL = settings.detectionUrl || 'http://localhost:3000/api/detection';
     const PHONE = { w: 418, h: 872 };
 
+    const appWorkspace = document.querySelector('.app-workspace');
     const iframe = document.getElementById('app');
+    const visionDot = document.getElementById('vision-dot');
+    const visionStatus = document.getElementById('vision-status');
+    const visionMeta = document.getElementById('vision-meta');
+    const visionFrame = document.getElementById('vision-frame');
+    const visionRefresh = document.getElementById('vision-refresh');
+    const visionJson = document.getElementById('vision-json');
+    const framePrevious = document.getElementById('frame-previous');
+    const frameNext = document.getElementById('frame-next');
+    const frameMode = document.getElementById('frame-mode');
     const isDesktop = () => window.matchMedia('(min-width: 601px)').matches;
+    const detectionFrames = { original: null, masked: null };
+    let selectedFrame = 'masked';
+    let detectionTimer = null;
+    let detectionInFlight = false;
 
     document.getElementById('open').href = APP_URL;
 
     function fit() {
       const stage = document.querySelector('.stage');
-      const stacked = window.innerWidth <= 860;
-      const maxH = window.innerHeight - 48;
-      const maxW = stacked ? window.innerWidth - 40 : Math.max(320, window.innerWidth * 0.45);
+      const stacked = window.innerWidth <= 920;
+      const maxH = Math.max(320, (appWorkspace?.clientHeight || window.innerHeight) - 48);
+      const maxW = stacked
+        ? window.innerWidth - 40
+        : Math.max(220, (appWorkspace?.clientWidth || window.innerWidth) * 0.46);
       const scale = Math.min(1, maxH / PHONE.h, maxW / PHONE.w);
-      document.documentElement.style.setProperty('--scale', String(Math.max(0.5, scale)));
+      document.documentElement.style.setProperty('--scale', String(Math.max(0.36, scale)));
       if (stage) stage.hidden = false;
     }
 
@@ -348,6 +621,107 @@
       iframe.src = 'about:blank';
       requestAnimationFrame(() => (iframe.src = APP_URL));
     });
+
+    function setVisionState(state, message, meta = '') {
+      visionDot.className = `vision-dot${state === 'ready' ? ' ready' : state === 'error' ? ' error' : ''}`;
+      visionStatus.textContent = message;
+      visionStatus.hidden = state === 'ready';
+      visionMeta.textContent = meta;
+    }
+
+    function renderApiResponse(payload) {
+      const preview = { ...payload };
+      for (const key of ['image', 'originalImage']) {
+        if (typeof preview[key] === 'string' && preview[key].startsWith('data:image/')) {
+          preview[key] = `${preview[key].slice(0, 32)}… [${preview[key].length.toLocaleString()} characters; abbreviated]`;
+        }
+      }
+      visionJson.textContent = JSON.stringify(preview, null, 2);
+    }
+
+    function renderSelectedFrame() {
+      const preferred = detectionFrames[selectedFrame];
+      const fallbackKey = selectedFrame === 'masked' ? 'original' : 'masked';
+      const source = preferred || detectionFrames[fallbackKey];
+      if (!preferred && source) selectedFrame = fallbackKey;
+
+      if (source) {
+        visionFrame.src = source;
+        visionFrame.hidden = false;
+      }
+
+      const canSwitch = Boolean(detectionFrames.original && detectionFrames.masked);
+      framePrevious.disabled = !canSwitch;
+      frameNext.disabled = !canSwitch;
+      frameMode.textContent = selectedFrame === 'original' ? 'Original' : 'Detection zones';
+      visionFrame.alt = selectedFrame === 'original'
+        ? 'Latest original parking camera frame'
+        : 'Latest parking camera frame with marked detection areas';
+    }
+
+    function switchFrame() {
+      if (!detectionFrames.original || !detectionFrames.masked) return;
+      selectedFrame = selectedFrame === 'masked' ? 'original' : 'masked';
+      renderSelectedFrame();
+    }
+
+    function nextDetectionDelay(intervalMs) {
+      const interval = Number(intervalMs);
+      return Number.isFinite(interval) ? Math.min(120000, Math.max(5000, interval)) : 10000;
+    }
+
+    function scheduleDetection(intervalMs) {
+      window.clearTimeout(detectionTimer);
+      detectionTimer = window.setTimeout(() => { void loadDetection(); }, nextDetectionDelay(intervalMs));
+    }
+
+    function capturedAtLabel(capturedAt) {
+      if (!capturedAt) return 'Waiting for the first captured frame.';
+      const captured = new Date(capturedAt);
+      if (Number.isNaN(captured.getTime())) return '';
+      return `Captured ${captured.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+    }
+
+    async function loadDetection({ refresh = false } = {}) {
+      if (detectionInFlight) return;
+      detectionInFlight = true;
+      visionRefresh.disabled = true;
+      if (visionFrame.hidden) setVisionState('loading', 'Connecting to the camera service…');
+
+      try {
+        const endpoint = new URL(DETECTION_URL, window.location.href);
+        if (refresh) endpoint.searchParams.set('refresh', 'true');
+        const response = await fetch(endpoint, {
+          headers: { Accept: 'application/json' },
+          cache: 'no-store',
+        });
+        const payload = await response.json();
+        if (!payload || typeof payload !== 'object') throw new Error('The camera service returned an invalid response.');
+
+        if (typeof payload.image === 'string' && payload.image.startsWith('data:image/')) detectionFrames.masked = payload.image;
+        if (typeof payload.originalImage === 'string' && payload.originalImage.startsWith('data:image/')) detectionFrames.original = payload.originalImage;
+        renderSelectedFrame();
+
+        const state = payload.status === 'ready' ? 'ready' : payload.status === 'error' ? 'error' : 'loading';
+        setVisionState(state, payload.message || `Camera service returned ${response.status}.`, capturedAtLabel(payload.capturedAt));
+        renderApiResponse(payload);
+        scheduleDetection(payload.intervalMs);
+      } catch (_error) {
+        setVisionState('error', 'Camera service is unavailable. Retrying shortly.');
+        renderApiResponse({
+          status: 'error',
+          message: 'Camera service is unavailable. Retrying shortly.',
+        });
+        scheduleDetection(10000);
+      } finally {
+        detectionInFlight = false;
+        visionRefresh.disabled = false;
+      }
+    }
+
+    framePrevious.addEventListener('click', switchFrame);
+    frameNext.addEventListener('click', switchFrame);
+    visionRefresh.addEventListener('click', () => { void loadDetection({ refresh: true }); });
 
     function tick() {
       const now = new Date();
@@ -361,6 +735,7 @@
 
     fit();
     load();
+    void loadDetection({ refresh: true });
     tick();
     setInterval(tick, 15000);
   </script>
